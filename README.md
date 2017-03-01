@@ -46,18 +46,18 @@ $ su - postgres
 $ createuser vagrant -s
 $ psql
 postgres=# \password vagrant # vagrantユーザにパスワードを設定
-Enter new password: # 何も入力せずにEnter
-Enter it again: # 何も入力せずにEnter
+Enter new password: #パスワードを適当に設定する
+Enter it again:
 postgres=# \q # psqlプロンプト終了
 $ exit
 ```
-- pg_hba.confの81行目付近を以下のように書き換える (peer > trust)
+- pg_hba.confの81行目付近を以下のように書き換える (peer > md5)
 ```
 $ sudo vi /var/lib/pgsql/9.5/data/pg_hba.conf
 
 # "local" is for Unix domain socket connections only
 # local   all             all                                     peer
-local   all             all                                     trust
+local   all             all                                     md5
 
 $ sudo systemctl restart postgresql-9.5.service
 ```
@@ -84,9 +84,17 @@ gem 'pg', '0.17.1'
 $ bundle install --path ~/bundler/hello_app/vendor/bundle
 ```
 
-- railsプロジェクトの作成
+- railsプロジェクトの作成とDB設定
 ```
 $ bundle exec rails new . --database=postgresql
+$ vi config/database.yml
+
+# database.ymlを編集し、defaultにusernameとpasswordを設定
+default:
+  ...
+  username: vagrant
+  password: # 先ほど設定したパスワード
+
 $ bin/rake db:create
 ```
 
